@@ -1,4 +1,4 @@
-# IETF Energyaware Differentiated Services (EA-DS) draft - informational
+# IETF Energy-aware Differentiated Services (EA-DS) draft - informational
 
 
 
