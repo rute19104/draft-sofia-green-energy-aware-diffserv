@@ -1,0 +1,734 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+     draft-rfcxml-general-template-standard-00
+  
+     This template includes examples of the most commonly used features of RFCXML with comments 
+     explaining how to customise them. This template can be quickly turned into an I-D by editing 
+     the examples provided. Look for [REPLACE], [REPLACE/DELETE], [CHECK] and edit accordingly.
+     Note - 'DELETE' means delete the element or attribute, not just the contents.
+     
+     Documentation is at https://authors.ietf.org/en/templates-and-schemas
+-->
+<?xml-model href="rfc7991bis.rnc"?>  <!-- Required for schema validation and schema-aware editing -->
+<!-- <?xml-stylesheet type="text/xsl" href="rfc2629.xslt" ?> -->
+<!-- This third-party XSLT can be enabled for direct transformations in XML processors, including most browsers -->
+
+
+<!DOCTYPE rfc [
+  <!ENTITY nbsp    "&#160;">
+  <!ENTITY zwsp   "&#8203;">
+  <!ENTITY nbhy   "&#8209;">
+  <!ENTITY wj     "&#8288;">
+]>
+<!-- If further character entities are required then they should be added to the DOCTYPE above.
+     Use of an external entity file is not recommended. -->
+
+<rfc
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  category="info"
+  docName="draft-sofia-green-energy-aware-diffserv-00"
+  ipr="trust200902"
+  obsoletes=""
+  updates=""
+  submissionType="IETF"
+  xml:lang="en"
+  version="3">
+  
+<!-- [REPLACE] 
+       * docName with name of your draft
+     [CHECK] 
+       * category should be one of std, bcp, info, exp, historic
+       * ipr should be one of trust200902, noModificationTrust200902, noDerivativesTrust200902, pre5378Trust200902
+       * updates can be an RFC number as NNNN
+       * obsoletes can be an RFC number as NNNN 
+-->
+
+  <front>
+    <title abbrev="Energy-aware DiffServ">Energy-aware Differentiated Services (EA-DS)</title>
+    <!--  [REPLACE/DELETE] abbrev. The abbreviated title is required if the full title is longer than 39 characters -->
+
+    <seriesInfo name="Internet-Draft" value="draft-sofia-green-energy-aware-diffserv-00"/>
+   
+    <author fullname="Rute C. Sofia" initials="R." surname="C. Sofia">
+      <!-- [CHECK]
+             * initials should not include an initial for the surname
+             * role="editor" is optional -->
+    <!-- Can have more than one author -->
+      
+    <!-- all of the following elements are optional -->
+      <organization>fortiss GmbH</organization>
+      <address>
+        <postal>
+          <!-- Reorder these if your country does things differently -->
+          <street>Guerickestr. 25</street>
+          <city>Munich</city>
+          <code>80805</code>
+          <country>DE</country>
+          <!-- Uses two letter country code -->
+        </postal>        
+        <email>sofia@fortiss.org</email>  
+        <!-- Can have more than one <email> element -->
+        <uri>www.rutesofia.com</uri>
+      </address>
+    </author>
+
+    <author fullname="Dalal Ali" initials="D." surname="Ali">
+      <!-- [CHECK]
+             * initials should not include an initial for the surname
+             * role="editor" is optional -->
+    <!-- Can have more than one author -->
+      
+    <!-- all of the following elements are optional -->
+      <organization>fortiss GmbH</organization>
+      <address>
+        <postal>
+          <!-- Reorder these if your country does things differently -->
+          <street>Guerickestr. 25</street>
+          <city>Munich</city>
+          <code>80805</code>
+          <country>DE</country>
+          <!-- Uses two letter country code -->
+        </postal>        
+        <email>ali@fortiss.org</email>  
+        <!-- Can have more than one <email> element -->
+        <uri></uri>
+      </address>
+    </author>
+
+   
+     <date day="06" month="July" year="2025" />
+    <!-- On draft subbmission:
+         * If only the current year is specified, the current day and month will be used.
+         * If the month and year are both specified and are the current ones, the current day will
+           be used
+         * If the year is not the current one, it is necessary to specify at least a month and day="1" will be used.
+    -->
+
+
+    <area>Routing</area>
+    <workgroup>Getting Ready for Energy-Efficient Networking</workgroup>
+    <keyword>Internet-Draft</keyword>
+    <keyword>Greenness</keyword>
+    <keyword>DiffServ</keyword>
+    <keyword>QoS</keyword>
+   <keyword>Edge-Cloud</keyword>
+
+    <abstract>
+      <t> 
+     This document proposes to extend the Differentiated Services (DiffServ) Quality of Service (QoS) model to support energy-efficient networking. As a first draft, it discusses how such extensions could be done, bringing first examples of energy-efficiency metrics that could be applied to mark traffic, and providing routing applicability examples by interpreting existing or experimental DSCP codepoints to represent not only traditional QoS parameters (e.g., latency, jitter), but also application-level energy sensitivity. By incorporating energy metrics into traffic classification, network devices and orchestrators can make routing and resource allocation decisions that optimize both service performance and energy consumption.
+
+     </t>
+   </abstract>
+    
+  </front>
+
+  <middle>
+    
+    <section>
+      <name>Introduction</name>
+      <t>Energy efficiency and sustainability are becoming design priorities in data communications, driven by the increasing complexity of ultra-dense, heterogeneous mobile network environments and the proliferation of mobile, decentralized applications. These applications often demand not only high processing power and bandwidth, but also bounded latency guarantees. At the same time, several international efforts are aligning with global net-zero objectives, investing in energy-optimized infrastructures,  relying on Artificial Intelligence (AI)-based power management, renewable energy integration, and intelligent resource allocation strategies spanning both hardware and software development.
+
+As discussed in initiatives such as GREEN and the IRTF SUSTAIN research group, there is a growing need to integrate energy awareness into the broader operation of communication networks. This includes embedding energy considerations into the routing and forwarding processes, which are traditionally optimized solely for performance metrics.
+
+In this context, the present work proposes extending Quality of Service (QoS) models by incorporating energy-specific metrics as first-class parameters. Integrating energy sensitivity into QoS models offers tangible benefits across network management and operations. However, it also introduces new challenges: how to effectively express and signal energy metrics, how to gather and interpret the required telemetry, and how to manage the trade-offs between energy savings, system complexity, and performance. 
+
+To address this, this draft specifically focuses on how such integration would fit the Differentiated Services (DiffServ) model as defined in <xref target="RFC2474"/> and <xref target="RFC2475"/>. The approach is to interpret existing and experimental DiffServ Code Points (DSCP) to encode both application-level QoS requirements and energy-related constraints. By doing so, network elements such as routers, switches, and orchestrators can make resource allocation and forwarding decisions that take into account energy-sensitivity parameters, such as power consumption or CO2 footprinting. This enables a more energy-efficient network behavior without compromising service-level expectations.
+
+</t>
+      
+      <section>
+        <name>Requirements Language</name>
+        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
+          "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT
+          RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+          interpreted as described in BCP 14 <xref target="RFC2119"/>
+          <xref target="RFC8174"/> when, and only when, they appear in
+          all capitals, as shown here.</t>
+      </section>
+      <!-- [CHECK] The 'Requirements Language' section is optional -->
+
+<section anchor="statement">
+ <name>Problem Statement</name>
+<t>
+As networks and internet applications evolve from real-time control systems to data-intensive analytics heavily involving AI workloads, the need to manage both performance and energy efficiency during networking operations, such as routing, is becoming increasingly critical. 
+
+Quality of Service (QoS) models such as the Differentiated Services (DiffServ) <xref target="RFC2474"/><xref target="RFC2475"/> offer well-established frameworks for expressing and enforcing QoS application requirements in the form of latency, jitter, packet loss, among others. However, the modern shift toward decentralized architectures, such as multi-tenant, heterogeneous, and dynamic edge-cloud environments, demands a dual operational objective: maintaining service quality while minimizing energy consumption. 
+
+Applications now vary not only in their strict traditional QoS constraints, but also in their energy sensitivity and adaptability. For instance, an Internet of Things (IoT) telemetry flow may tolerate delayed or batched delivery to reduce energy use, while a control loop for an industrial system may demand immediate and high-energy processing regardless of cost.
+
+In the absence of mechanisms to signal such energy-related requirements within a QoS model like DiffServ, network elements and orchestration systems lack the information needed to make coordinated decisions that optimize for both energy and performance, while meeting application-level requirements. Enabling such integration would support dynamic, intelligent traffic handling, including energy-aware routing ("green" routing), scaling of compute resources based on traffic class, or even energy-based preemption, while still respecting application-level QoS expectations.
+
+DiffServ provides a scalable approach to classifying and prioritizing traffic using Differentiated Services Code Points (DSCP). It effectively addresses performance-related service differentiation, but, similarly to other QoS models, it is agnostic to the energy consumption of the underlying infrastructure, whether in the forwarding paths or in the compute nodes executing workloads.
+
+As such, extending DiffServ to incorporate energy-awareness is a timely and necessary evolution to support sustainable, energy-efficient, and policy-aligned networking in increasingly complex and environmentally conscious operational environments.
+
+</t>
+</section>
+
+<section anchor="scope">
+ <name>Scope and Applicability</name>
+<t>
+The energy-aware discussion on extensions to DiffServ proposed in this document is applicable in environments where fine-grained policy enforcement, traffic classification, and telemetry-driven routing or scheduling are operationally feasible. The work is primarily applicable to multi-tenant federated edge-cloud environments where energy-sensitive networking policies are relevant. These include:
+
+</t>
+<ul>
+<li>Cloud-edge computing infrastructures, especially those integrating AI workloads or energy-constrained nodes.</li>
+<li>Industrial IoT environments, where specific classes of traffic (e.g., control loops vs. telemetry) exhibit distinct energy and latency requirements.</li>
+<li>Software-defined WANs (SD-WANs) deployments, where centralized controllers manage QoS and routing policies.</li>
+<li>Federated edge-cloud platforms, such as those based on CODECO, where energy efficiency is a key orchestration objective.</li>
+</ul>
+<t>
+These scenarios typically involve DSCP marking and enforcement at ingress points, real-time or periodic energy/load telemetry collection, and centralized or distributed routing logic. The proposed approach assumes that DSCP markings are respected across the path and that telemetry is exposed with sufficient granularity, with attention to privacy
+
+</t>
+</section>
+
+
+<section anchor="definitions">
+  <name>Definitions</name>
+
+  <dl newline="true">
+        <!-- Omit newline="true" if you want each definition to start on the same line as the corresponding term -->
+        <dt>Latency:</dt>
+        <dd>(also known as bounded latency) refers to the end-to-end transmission delay between a sender and a receiver when a traffic flow is initiated by an application. By definition, latency corresponds to the time interval between the sending of the first packet of a flow from a source to a destination and the time at which the last packet of that flow is received</dd>
+        <dt>Node energy, n_e(i)</dt>
+        <dd>is the amount of energy (typically measured in Joules or Watts over time) consumed by a node to host, process, and serve workloads, including compute, memory, storage,  and network interface activity.</dd>
+        <dt>Node load</dt>
+        <dd>CPU, memory, or I/O resource usage that may affect dynamic energy consumption and thermal management.</dd>
+        <dt>Link energy, l_e(i,j)</dt>
+        <dd>The amount of energy (typically measured in milliJoules per bit (mJ/bit) or Watts) consumed by the transmission of data across a network connection between two nodes, including switches, routers, and network interface cards (NICs) involved in the path.</dd>
+         <dt>Link load, l(i,j)</dt>
+        <dd>The current traffic load (e.g., as a percentage of link capacity), which can affect both latency and energy cost.</dd>
+          <dt>Energy sensitivity</dt>
+        <dd>A qualitative or quantitative indication of how tolerant a given application or flow is to variations in energy consumption (e.g., delay to save power, or no tolerance at all).</dd>
+      </dl>
+    
+
+</section>
+    </section>
+    
+    
+<section anchor="Energy-awareness">
+<name>Energy-awareness and Node, Link, Path Telemetry Considerations</name>
+<t>
+To enable energy-aware routing and resource management, network elements MUST have access to timely, accurate telemetry about the energy consumption and utilization characteristics of both nodes and links. This information allows the control or data plane to make informed decisions about path selection and traffic treatment based not only on traditional QoS metrics (e.g., delay, jitter, loss), but also on energy-related factors.
+
+To enforce energy-aware policies, networking nodes MUST expose telemetry on:
+</t>
+   <ul>
+   <li>Node energy.</li>
+   <li>Node usage</li>
+   <li>Link energy.</li>
+   <li>Link usage</li>
+   
+   
+  </ul>
+  <t>
+    Network nodes MAY also expose telemetry on other parameters such as:
+ </t>
+   <ul>
+          <li>Node power state transition (e.g., idle, transmit, receive modes).</li>
+          <li>Other energy related metrics, such as CO2 footprint.</li>
+   </ul>
+
+ <t>  
+ A combined path energy cost can be computed by aggregating both node and link energy metrics along a given forwarding path.
+
+Formulations of some of these metrics can be found in related initiatives.  As a representative example, this work references node and link energy/load metrics used in the CODECO edge-cloud container orchestration framework <xref target="codeco"/>. While CODECO offers a practical implementation of energy metric collection and usage, the definitions and methods presented here are not exclusive to CODECO and can be generalized to other orchestration or telemetry frameworks. Hence, the metrics defined in CODECO deliverable D10 <xref target="codeco_d10"/> offer a compute- and network-oriented view of energy metrics and can serve as a useful reference for exploring how similar principles might be applied to DiffServ-based QoS extensions. These metrics are illustrative and not prescriptive, and alternative formulations or telemetry models may be equally valid. Such telemetry can serve as input for policy engines or SDN controllers in future DiffServ extensions. In particular, the CODECO framework defines:
+
+</t>
+   <ul>
+   <li>Node energy as n_e(i): Per-node energy over time, aggregated from system sensors.</li>
+   <li>Link energy, l_e(i,j): Dynamic energy cost for traffic across interface j of node i, derived from interface statistics and probing.</li>
+   <li>Node usage: % of CPU available derived from interface statistics and probing.</li>
+   <li>Link usage, l: traffic across interface j of node i, derived from interface statistics and probing.</li>
+ </ul>
+ 
+
+</section>
+
+<section anchor="Energy-aware-DSCP">
+<name>Energy-aware DSCP Mapping</name>
+<t>
+ The DSCP field provides a 6-bit space in the IP header used to classify traffic into Per-Hop Behaviors (PHBs), as defined in [RFC2474] and further elaborated in <xref target="RFC4594"/>. This document proposes extending the semantics of selected DSCP values to encode energy sensitivity, in addition to traditional QoS dimensions such as latency, jitter, and packet loss.
+
+Table 1 provides a representative mapping of DSCP values to energy-aware service classes. Where possible, this mapping is aligned with the traffic classes and PHBs defined in RFC 4594, ensuring backward compatibility and operational consistency. Additionally, a subset of experimental DSCP values (from the local/experimental range) is introduced to support emerging use cases in energy-aware networking environments.
+
+Each DSCP class in the table is annotated with an intended energy sensitivity, an example use case, and a recommended policy behavior. These annotations are illustrative and meant to guide implementations that wish to leverage DiffServ for integrated energy and performance-aware traffic treatment.
+
+Experimental DSCP values (e.g., 0x2E, 0x1A, 0x0A) are intended for closed or federated environments where domain-wide agreement on codepoint interpretation is feasible. These enable finer-grained control over routing or resource scheduling policies that optimize for energy efficiency alongside service quality.
+  </t>
+  <table>
+  <name>Energy-aware DSCP Mapping Aligned with RFC 4594</name>
+  <thead>
+    <tr>
+      <th>DSCP Value</th>
+      <th>PHB Name</th>
+      <th>RFC 4594 Traffic Class</th>
+      <th>Energy Sensitivity</th>
+      <th>Example Usage</th>
+      <th>Example Recommended Behaviour</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>46</td>
+      <td>EF</td>
+      <td>Real-Time Interactive</td>
+      <td>Ignore</td>
+      <td>VoIP, industrial control</td>
+      <td>Route via path with lowest latency and jitter; energy cost not considered</td>
+    </tr>
+    <tr>
+      <td>34</td>
+      <td>AF41</td>
+      <td>Broadcast Video</td>
+      <td>Moderate</td>
+      <td>Real-time HD video</td>
+      <td>Prefer low-latency and low-loss paths with moderate energy awareness</td>
+    </tr>
+    <tr>
+      <td>26</td>
+      <td>AF31</td>
+      <td>Multimedia Conferencing</td>
+      <td>Moderate</td>
+      <td>Interactive conferencing</td>
+      <td>Route via medium-energy, lightly loaded paths to balance latency and energy-efficiency</td>
+    </tr>
+    <tr>
+      <td>18</td>
+      <td>AF21</td>
+      <td>High Throughput Data</td>
+      <td>High</td>
+      <td>AI/ML batch jobs, smart uploads</td>
+      <td>Prefer energy-efficient routes even if slightly higher delay; include load balancing</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>AF11</td>
+      <td>Low-Latency Data</td>
+      <td>High</td>
+      <td>Firmware updates, telemetry sync</td>
+      <td>Select underutilized, low-energy paths, tolerate variable latency</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>CS1</td>
+      <td>Background Data</td>
+      <td>Very High</td>
+      <td>Backups, logs, cold storage</td>
+      <td>Route via lowest-energy, longest-delay paths; preemptable traffic</td>
+    </tr>
+    <tr>
+      <td>0</td>
+      <td>BE</td>
+      <td>Best Effort</td>
+      <td>Max energy savings</td>
+      <td>Non-critical data transfer</td>
+      <td>Allow opportunistic routing; energy-efficiency maximized, no performance guarantee</td>
+    </tr>
+    <tr>
+      <td>0x2E</td>
+      <td>EXP</td>
+      <td>Experimental Use (High Priority)</td>
+      <td>Low</td>
+      <td>Secure, energy-sensitivity critical flows</td>
+      <td>Route through secure but energy-aware paths; monitored for telemetry feedback</td>
+    </tr>
+    <tr>
+      <td>0x1A</td>
+      <td>EXP</td>
+      <td>Experimental Balanced Load</td>
+      <td>Moderate</td>
+      <td>Distributed compute jobs</td>
+      <td>Trade-off between energy cost and congestion across nodes and links</td>
+    </tr>
+    <tr>
+      <td>0x0A</td>
+      <td>EXP</td>
+      <td>Experimental Energy Saver</td>
+      <td>Very High</td>
+      <td>Delay-tolerant batch processing</td>
+      <td>Explicitly prefer energy-minimizing paths; opportunistic or deferred routing</td>
+    </tr>
+  </tbody>
+</table>
+
+</section>
+
+<section anchor="Routing">
+<name>Routing Behaviour</name>
+<t>
+Network elements and orchestrators MAY implement routing and scheduling decisions that consider both the DSCP value (as a proxy for energy sensitivity) and real-time energy metrics collected from network nodes and links.
+
+A few examples based on the Figure 1 topology:
+
+</t>
+
+  <figure>
+        <name>Example topology with link and node Energy/Load Metrics.</name>
+       <artset>
+        <!-- This <artset> includes two <artwork> elements, each of a different type -->
+         <artwork type="ascii-art">
+<![CDATA[
+                     R1
+                  /     \
+     l_e=1.2,l=60%     l_e=1.0,l=50%
+              /             \
+            A                 B
+             \               /
+     l_e=0.8,l=40%     l_e=0.6,l=35%
+               \       /
+                R2----------\
+                 |           \
+     l_e=0.7,l=30%             \ l_e=0.6,l=25%
+                 |             \
+                 C--------------D
+               /                 \
+     l_e=0.5,l=20%           l_e=0.4,l=15%
+             /                   \
+          (1)                   (2)  (Source and Destination)
+]]>
+</artwork>
+
+        </artset>
+     </figure>
+
+
+<t>Where:
+</t>
+
+ <ul>
+          <li>(1) Source node.</li>
+          <li>(2) Destination node</li>
+          <li>R1, R2 routers</li>
+          <li> A, B, C, D: Intermediate access routers/edge nodes</li>
+   </ul>
+
+<t>Between nodes, each link has the following costs:
+</t>
+
+ <ul>
+          <li>e = energy per bit (in mJ/bit).</li>
+          <li> l = current load (in % usage)</li>
+   </ul>
+
+<section anchor="example1">
+<name>Example: Minimize Link Energy</name>
+<t>
+The aim is to define a policy that always selects links with lowest energy, independently of node energy or load. Here, delay-tolerant or low-priority traffic WOULD be routed via links that overall provide the minimum cumulative energy cost, independently of the node location, number of hops, or total latency.
+
+</t>
+   <ul>
+      <li>Selected path: 1 -- C --D --2</li>
+      <li>Link Costs:</li>
+      <li>1--C: 0.5, C--D: 0.4, D--2: 0.4 = 1.3 mJ/bit total link energy </li>
+      <li>Alternative Path (e.g., via R1): much higher link energy (1.2+1.0)</li>
+      <li>DSCP: CS1 (8) or BE (0)</li>
+      <li>Traffic example: Background data sync, logs</li>
+   </ul>
+
+</section>
+
+<section anchor="example2">
+<name>Example: Lowest Total Energy (Links and Nodes)</name>
+<t>
+The aim is to define a policy that results in the selection of routes with both total lowest cumulative energy, and low utilization, considering both link and node load.
+</t>
+  <ul>
+   <li>Candidate Path: 1 --C --R2 --B --2</li>
+   <li>Link energy: 0.5 + 0.7 + 0.6 + 0.6 = 2.4</li>
+   <li>Node energy: C (0.6) + R2 (0.9) + B (1.0) = 2.5</li>
+   <li>Total = 4.9 mJ/bit</li>
+   <li>Alternative path via R1 has total energy = 6.0+ mJ/bit</li>
+   <li>DSCP: AF31 (26) or AF21 (18)</li>
+   <li>Traffic example: Analytics, smart batching apps</li>
+</ul>
+
+</section>
+
+<section anchor="example3">
+<name>Example: Lowest Energy-Load Preference</name>
+<t>
+The aim of this policy would be to consider a combination of energy and load, to ensure that traffic WOULD be routed over nodes that can offer the path with low energy and also low usage:
+</t>
+  <ul>
+<li>Candidate Path: 1 --C --R2 --D --2</li>
+<li>Load: C -- 20%, R2 -- 30%, D -- 15%, links -- 25-30%</li>
+<li>Energy: C + R2 + D = 0.6 + 0.9 + 0.5 = 2.0 mJ (nodes)</li>
+<li>Links 2.0 mJ --Total 4.0 mJ</li>
+<li>DSCP: AF11 (10) or Experimental (0x30)</li>
+<li>Traffic Type: Opportunistic jobs like firmware updates or distributed computations where network and compute utilization should be minimized.</li>
+</ul>
+
+</section>
+
+<section anchor="example4">
+<name>Example: No energy-awareness Preference</name>
+<t>
+
+In this example, the DSCP marking would allow routers to ignore any energy preference, ensuring a traditional expedited treatment.
+</t>
+  <ul>
+<li>Path Selected: 1 --C --R2 --A --R1 --B --2</li>
+<li>DSCP Mapping: EF (DSCP 46)</li>
+<li>Traffic Type: Real-time voice/video or control systems</li>
+</ul>
+
+</section>
+</section>
+
+<section anchor="telemetry">
+<name>Telemetry and Probing for Energy-aware Routing Considerations</name>
+<t>
+Energy-aware service differentiation requires accurate, real-time insights into the state of the network, particularly with respect to energy consumption
+and resource load. Such insights can be gathered through two primary telemetry mechanisms: passive or active (in-band) probing.
+</t>
+
+<section anchor="telemetry1">
+<name>Passive Probing</name>
+<t>
+Passive probing refers to the collection of performance and usage metrics by observing ongoing traffic without modifying it. Common methods
+include flow monitoring (e.g., NetFlow, IPFIX), SNMP-based counters, interface statistics, and network tap-based analytics.
+
+Passive probing is advantageous due to its low intrusiveness, wide support in existing infrastructure, and suitability for long-term
+trend analysis. However, it typically lacks real-time granularity, does not reflect per-packet variation, and often provides limited
+insight into specific in-network behavior such as queuing delay or microbursts. 
+
+Passive probing is beneficial to bring a fine-grained perspective on energy sensitivity based on:
+</t>
+  <ul>
+
+  <li>Interface energy counters (if supported by hardware)</li>
+  <li>Node CPU/memory utilization</li>
+  <li>Link usage</li>
+  </ul>
+
+</section>
+
+
+<section anchor="telemetry2">
+<name>Active Probing</name>
+<t>
+Active probing (or in-band telemetry) involves the use of explicit probes or modifications to data-plane packets to embed monitoring information. This includes:
+</t>
+  <ul>
+
+    <li>In-situ Operations, Administration, and Maintenance (IOAM) <xref target="RFC9197"/> </li>
+    <li>In-band Network Telemetry (INT) using programmable data planes (e.g., P4)</li>
+    <li>Application-layer probes for measuring latency and loss</li>
+    <li>Synthetic probing (e.g., ping, traceroute with extensions)</li>
+</ul>
+<t>
+Active probing allows for per-hop, per-packet collection of:
+</t>
+  <ul>
+
+    <li>Processing delay</li>
+    <li>Queue depth</li>
+    <li>Path-level latency and jitter</li>
+    <li>Node and link identifiers</li>
+    <li>(Optionally) energy cost annotations per segment</li>
+</ul>
+<t>
+This level of visibility is especially valuable for adaptive, energy-aware routing decisions. For example, flows marked with energy-sensitive DSCP
+values may be routed dynamically based on the measured per-path energy profile, using IOAM metadata. However, in the context of edge-cloud multi-tenant, federated environments, active probing may increase the overall operational inherent to deploying a monitoring architecture across mobile, heterogeneous large-scale edge-cloud environments.
+</t>
+</section>
+
+<section anchor="telemetry3">
+<name>Hybrid Approaches</name>
+<t>
+In practice, energy-sensitive service differentiation may benefit from a combination of passive and active mechanisms. Passive metrics can provide baseline load and energy cost estimates, while active probing offers precision feedback for high-priority or adaptive flows.
+
+Control planes (e.g., SDN controllers or orchestrators) can use telemetry to:
+</t>
+  <ul>
+
+  <li>Select energy-efficient paths for DSCP classes that tolerate delay</li>
+  <li>Adjust queue policies or scheduling weights in real-time</li>
+  <li>Trigger re-marking or flow deferral when energy thresholds are reached</li>
+</ul>
+<t>
+
+Probing systems MUST ensure time-synchronization and data fidelity if they are used for per-hop energy optimization. Energy-related telemetry formats and reporting intervals SHOULD be aligned with flow-level characteristics to avoid overreaction or instability.
+
+</t>
+</section>
+</section>
+
+<section anchor="IANA">
+<name>IANA Considerations</name>
+
+<t>This document does not request IANA action but suggests using DSCP values in the experimental or local-use ranges for energy-aware extensions.</t>
+
+</section>
+
+ 
+<section anchor="security-considerations">
+<name>Security Considerations</name>
+<t>
+Energy-aware Differentiated Services introduce several new potential attack vectors and privacy implications beyond those already present in traditional DiffServ and QoS mechanisms.
+</t>
+
+<section anchor="sec-dscp">
+<name>DSCP Misuse and Traffic Reclassification</name>
+<t>
+This work proposes to rely on experimental DSCP values to signal energy sensitivity and influence routing and scheduling decisions. Malicious or misconfigured endpoints
+could falsely mark traffic to gain preferential treatment, such as being routed through energy-saving paths or low-congestion nodes. To mitigate this, networks SHOULD:
+</t>
+  <ul>
+  <li>Enforce DSCP re-marking at domain ingress (e.g., at provider or enterprise edges)</li>
+  <li>Authenticate or validate traffic classification based on application profiles or identity</li>
+  <li>Restrict high-sensitivity DSCP values (e.g., EF or experimental green classes) to trusted endpoints</li>
+</ul>
+
+</section>
+
+<section anchor="sec-cp">
+<name>Control Plane Manipulation</name>
+<t>
+Energy-aware routing relies on telemetry and policy interpretation at centralized or distributed control planes. Attackers who gain access
+to these systems could manipulate:
+</t>
+  <ul>
+  <li>Energy metrics to bias routing</li>
+  <li>Load reports to induce congestion</li>
+  <li>Path computation engines to direct traffic inefficiently or disrupt service</li>
+</ul>
+<t>
+Control planes MUST be protected using standard practices:
+</t>
+  <ul>
+  <li>Mutual authentication between controllers and forwarding devices</li>
+  <li>Role-based access control (RBAC) for orchestration systems</li>
+  <li>Secure telemetry channels (e.g., TLS, IPsec)</li>
+  </ul>
+
+</section>
+
+<section anchor="sec-privacy">
+<name>Privacy Preservation</name>
+<t>
+Probing mechanisms, in particular active probing, may expose internal node performance, energy use, and utilization patterns.
+This can leak information about the network's architecture, topology, or workload behaviour.
+
+Networks SHOULD:
+</t>
+  <ul>
+
+  <li> Limit the telemetry scope (e.g., aggregate rather than per-packet reporting)</li>
+  <li> Apply encryption or anonymization where telemetry crosses trust boundaries</li>
+  <li> Use access controls for telemetry consumers and collectors  </li>
+</ul>
+</section>
+
+<section anchor="sec-energy">
+<name>Energy Specific Threats</name>
+<t>
+Manipulating energy-related behavior may not only degrade QoS but also undermine broader sustainability goals. Attackers may attempt to:
+</t>
+  <ul>
+
+  <li> Overload energy-efficient paths to force fallback to high-consumption infrastructure</li>
+  <li> Create asymmetric energy drain in multi-tenant environments</li>
+  <li> Starve critical energy-aware flows by congesting green paths</li>
+</ul>
+<t>
+Such threats can be mitigated by:
+</t>
+  <ul>
+
+  <li> Incorporating energy fairness into policy logic</li>
+  <li> Monitoring for unusual shifts in energy path usage</li>
+  <li> Reserving minimum energy budgets for critical DSCP classes</li>
+  </ul>
+
+</section>
+
+<section anchor="sec-id">
+<name>Inter-domain Trust and Policy Consistency</name>
+<t>
+
+In multi-domain deployments (e.g., federated edge-cloud or SD-WAN), DSCP interpretations and energy policies may vary across domains.
+Without consistent trust models, forwarding domains may ignore, alter, or misinterpret DSCP markings.
+
+To prevent this:
+</t>
+  <ul>
+
+  <li> Domains SHOULD negotiate DSCP-to-policy mappings where possible</li>
+  <li> Border routers MUST apply local enforcement and telemetry filtering</li>
+  <li> DSCP field usage SHOULD be aligned with IANA and IETF-recommended classes</li>
+  </ul>
+  
+</section>
+</section>
+
+  </middle>
+
+  <back>
+    <references>
+      <name>References</name>
+      <references>
+        <name>Normative References</name>
+        
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.8174.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.2474.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.2475.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.4594.xml"/>
+           <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.9197.xml"/>
+        <!-- The recommended and simplest way to include a well known reference -->
+        
+      </references>
+ 
+      <references>
+        <name>Informative References</name>
+       
+        <reference anchor="codeco">
+        <!-- [REPLACE/DELETE] Example minimum reference -->
+          <front>
+            <title>"A Framework for Cognitive, Decentralized Container Orchestration," inProc. IEEE Access, vol. 12, pp. 79978-80008, 2024, doi: 10.1109/ACCESS.2024.3406861. </title>
+            <author initials="R." surname="C. Sofia et al.">
+              <organization/>
+            </author>
+            <date year="2024"/>
+            <!-- [CHECK] -->
+          </front>
+        </reference>
+        <reference anchor="codeco_d10">
+        <!-- [REPLACE/DELETE] Example minimum reference -->
+          <front>
+            <title>"CODECO Deliverable D10 - Technological Guidelines, Reference Architecture, and Open-source Ecosystem Design.https://doi.org/10.5281/zenodo.12819444 </title>
+            <author initials="R." surname="C. Sofia et al.">
+              <organization/>
+            </author>
+            <date year="2024"/>
+            <!-- [CHECK] -->
+          </front>
+        </reference>
+
+      </references>
+    </references>
+    
+       <section anchor="Acknowledgements" numbered="false">
+      <!-- [REPLACE/DELETE] an Acknowledgements section is optional -->
+      <name>Acknowledgements</name>
+      <t>
+      This work has been funded by The European Commission in the context of the Horizon Europe CODECO project under grant number 101092696, and by SGC, Grant agreement nr: M-0626, project SemComIIoT. 
+      We thank the following colleagues for their discussions concerning network probing and exposure as well as application workload scheduling aspects:
+      </t>
+      <ul>
+      <li>Alberto del Rio, Universidad Politecnica de Madrid, for contributions for active probing.</li>
+      <li>Kaikang Huang, fortiss, for contributions on energy-efficient network telemetry and probing</li>
+      <li>Tina Samizadeh, fortiss, for contributions on scheduling benchmarking</li>
+      <li>Alejandro Muniz, Telefonica, for contributions on network exposure</li>
+      <li>Luis Miguel Contreras Murillo, Telefonica, for contributions on network exposure</li>
+      </ul>
+    </section>
+    
+    
+ </back>
+</rfc>
+
