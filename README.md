@@ -1,13 +1,23 @@
-# Internet-Draft Template Repository
+# IETF Energyaware Differentiated Services (EA-DS) draft - informational
 
-Use this repository as a template if you want to start working on
-[IETF](https://www.ietf.org/) documents. [Click here to create a new repository using the
-template](https://github.com/martinthomson/internet-draft-template/generate).
-Make sure to check "Include all branches", or you will need to enable GitHub Pages manually.
 
-[Read the
-instructions](https://github.com/martinthomson/i-d-template/blob/main/doc/TEMPLATE.md)
-for more information.
 
-Once you have created your own repository, start work by
-[renaming the `draft-todo-yourname-protocol.md` file](../../edit/main/draft-todo-yourname-protocol.md).
+Getting Ready for Energy-Efficient Networking                R. C. Sofia
+Internet-Draft                                                    D. Ali
+Intended status: Informational                              fortiss GmbH
+Expires: 7 January 2026                                      6 July 2025
+
+
+              Energy-aware Differentiated Services (EA-DS)
+               draft-sofia-green-energy-aware-diffserv-00
+
+
+# How to contribute
+
+-Contact the main author and suggest a contribution
+- work on the xml
+- request a merge
+
+
+Submitted version:
+https://datatracker.ietf.org/doc/draft-sofia-green-energy-aware-diffserv/
